@@ -34,6 +34,9 @@ public class ShoalFish : MonoBehaviour
     private void OnEnable()
     {
         All.Add(this);
+        // A pooled fish is reused, so reset what a new fish would start with.
+        age = 0f;
+        velocity = Random.insideUnitCircle.normalized * speed;
     }
 
     private void OnDisable()
@@ -43,7 +46,6 @@ public class ShoalFish : MonoBehaviour
 
     private void Start()
     {
-        velocity = Random.insideUnitCircle.normalized * speed;
         // Fish at different depths, so they swim in front of and behind each other.
         spriteRenderer.sortingOrder = Random.Range(0, 100);
         // Start each fish at a random point in the cycle, so the checks are spread over many frames.
@@ -67,7 +69,7 @@ public class ShoalFish : MonoBehaviour
         if (Random.value < bubblesPerSecond * Time.deltaTime) Spawner.SpawnBubble(transform.position);
 
         age += Time.deltaTime;
-        if (age > lifetime) Destroy(gameObject);
+        if (age > lifetime) Spawner.ReleaseFish(this);
     }
 
     // Steer away from every fish that is too close.
